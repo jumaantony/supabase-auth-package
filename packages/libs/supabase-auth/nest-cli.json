@@ -1,0 +1,16 @@
+{
+  "projects": {
+    "supabase-auth": {
+      "type": "library",
+      "root": "packages/libs/supabase-auth",
+      "entryFile": "index",
+      "sourceRoot": "packages/libs/supabase-auth/src",
+      "compilerOptions": {
+        "tsConfigPath": "packages/libs/supabase-auth/tsconfig.lib.json"
+      }
+    }
+  },
+  "compilerOptions": {
+    "webpack": true
+  }
+}
