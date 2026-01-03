@@ -1,135 +1,252 @@
-# Turborepo starter
+# Supabase Auth Package
 
-This Turborepo starter is maintained by the Turborepo core team.
+A monorepo containing a NestJS module for Supabase authentication and example applications demonstrating its usage.
 
-## Using this example
+## 📦 What's Inside?
 
-Run the following command:
+This Turborepo monorepo includes the following:
 
-```sh
-npx create-turbo@latest
+### Apps
+
+- **`example-api`** - A NestJS API application demonstrating how to use the `@app/supabase-auth` package
+- **`docs`** - A Next.js documentation site
+- **`web`** - A Next.js web application
+
+### Packages
+
+- **`@app/supabase-auth`** - A NestJS module for Supabase authentication with email/password support
+  - See [packages/libs/supabase-auth/README.md](./packages/libs/supabase-auth/README.md) for detailed documentation
+- **`@repo/ui`** - Shared React component library
+- **`@repo/eslint-config`** - Shared ESLint configurations
+- **`@repo/typescript-config`** - Shared TypeScript configurations
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js >= 18
+- pnpm >= 9.0.0
+- A Supabase project with:
+  - Project URL
+  - Service Role Key
+
+### Installation
+
+```bash
+# Install dependencies
+pnpm install
 ```
 
-## What's inside?
+### Environment Setup
 
-This Turborepo includes the following packages/apps:
+Create a `.env` file in the `apps/example-api` directory:
 
-### Apps and Packages
+```env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+PORT=3000
+```
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+## 🛠️ Development
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+### Run all apps in development mode
 
-### Utilities
+```bash
+pnpm dev
+```
 
-This Turborepo has some additional tools already setup for you:
+### Run a specific app
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+```bash
+# Run the example API
+pnpm dev --filter=example-api
+
+# Run the docs site
+pnpm dev --filter=docs
+
+# Run the web app
+pnpm dev --filter=web
+```
 
 ### Build
 
-To build all apps and packages, run the following command:
+Build all apps and packages:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+pnpm build
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Build a specific package:
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+```bash
+# Build the supabase-auth library
+pnpm build --filter=@app/supabase-auth
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+# Build the example API
+pnpm build --filter=example-api
 ```
 
-### Develop
+### Lint
 
-To develop all apps and packages, run the following command:
+Lint all packages:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+pnpm lint
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+Lint a specific package:
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+pnpm lint --filter=@app/supabase-auth
 ```
 
-### Remote Caching
+### Type Checking
+
+Check types across all packages:
+
+```bash
+pnpm check-types
+```
+
+## 📚 Using the Supabase Auth Package
+
+### Installation in Your Project
+
+```bash
+pnpm add @app/supabase-auth
+```
+
+### Quick Example
+
+```typescript
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SupabaseAuthModule } from '@app/supabase-auth';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    SupabaseAuthModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        supabaseUrl: configService.getOrThrow<string>('SUPABASE_URL'),
+        serviceRoleKey: configService.getOrThrow<string>('SUPABASE_SERVICE_ROLE_KEY'),
+      }),
+      inject: [ConfigService],
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { SupabaseAuthService } from '@app/supabase-auth';
+
+@Injectable()
+export class AuthService {
+  constructor(private readonly supabaseAuthService: SupabaseAuthService) {}
+
+  async signIn(email: string, password: string) {
+    const response = await this.supabaseAuthService.emailSignIn(email, password);
+    
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+    
+    return {
+      user: response.user,
+      session: response.session,
+    };
+  }
+}
+```
+
+For complete documentation, see [packages/libs/supabase-auth/README.md](./packages/libs/supabase-auth/README.md).
+
+## 🏗️ Project Structure
+
+```
+.
+├── apps/
+│   ├── example-api/          # NestJS API example
+│   ├── docs/                  # Next.js docs site
+│   └── web/                   # Next.js web app
+├── packages/
+│   ├── libs/
+│   │   └── supabase-auth/     # Main Supabase auth library
+│   ├── ui/                    # Shared UI components
+│   ├── eslint-config/         # ESLint configurations
+│   └── typescript-config/     # TypeScript configurations
+├── turbo.json                 # Turborepo configuration
+└── pnpm-workspace.yaml        # pnpm workspace configuration
+```
+
+## 🧪 Testing
+
+### Run tests for a specific app
+
+```bash
+# Run example-api tests
+pnpm test --filter=example-api
+```
+
+## 📝 Code Quality
+
+This project uses:
+
+- **TypeScript** for type safety
+- **ESLint** for code linting
+- **Prettier** for code formatting
+- **Turborepo** for monorepo management
+
+### Format code
+
+```bash
+pnpm format
+```
+
+## 🔧 Configuration
+
+### Turborepo
+
+The project uses [Turborepo](https://turborepo.org) for monorepo management. Configuration is in `turbo.json`.
+
+### Package Manager
+
+This project uses [pnpm](https://pnpm.io) as the package manager. The workspace is configured in `pnpm-workspace.yaml`.
+
+## 📦 Remote Caching
 
 > [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+Turborepo can use [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines.
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+To enable Remote Caching:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
+```bash
+# Authenticate with Vercel
 pnpm exec turbo login
-```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
+# Link your Turborepo to Remote Cache
 pnpm exec turbo link
 ```
 
-## Useful Links
+## 🤝 Contributing
 
-Learn more about the power of Turborepo:
+1. Create a new branch for your feature
+2. Make your changes
+3. Run tests and linting
+4. Submit a pull request
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 📄 License
+
+This project is private and proprietary.
+
+## 🔗 Useful Links
+
+- [Supabase Auth Package Documentation](./packages/libs/supabase-auth/README.md)
+- [Turborepo Documentation](https://turborepo.org/docs)
+- [NestJS Documentation](https://docs.nestjs.com)
+- [Supabase Documentation](https://supabase.com/docs)
