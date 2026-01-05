@@ -29,7 +29,7 @@ export interface IAuthResponseData {
   };
 }
 
-export interface IAuthAdditionalData{
+export interface IEmailSignUpAdditionalData{
   emailRedirectTo?: string;
   data?: Record<string, any>;
 }

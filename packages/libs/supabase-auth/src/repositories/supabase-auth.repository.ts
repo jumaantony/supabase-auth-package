@@ -1,7 +1,7 @@
 import { Injectable, Inject } from "@nestjs/common";
 import { SupabaseClient } from "@supabase/supabase-js";
 import {
-  IAuthAdditionalData,
+  IEmailSignUpAdditionalData,
   IAuthResponseData,
   IPhoneSignUpAdditionalData,
   SUPABASE_CLIENT,
@@ -17,7 +17,7 @@ export class SupabaseAuthRepository {
   async emailSignUp(
     email: string,
     password: string,
-    additionalData?: IAuthAdditionalData
+    additionalData?: IEmailSignUpAdditionalData
   ): Promise<IAuthResponseData> {
     const { data, error } = await this.supabase.auth.signUp({
       email,
