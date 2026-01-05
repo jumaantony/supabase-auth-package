@@ -33,3 +33,8 @@ export interface IAuthAdditionalData{
   emailRedirectTo?: string;
   data?: Record<string, any>;
 }
+
+export interface IPhoneSignUpAdditionalData {
+  channel: 'sms' | 'whatsapp';
+  data?: Record<string, any>;
+}

@@ -3,6 +3,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import {
   IAuthAdditionalData,
   IAuthResponseData,
+  IPhoneSignUpAdditionalData,
   SUPABASE_CLIENT,
 } from "../interface";
 
@@ -70,6 +71,56 @@ export class SupabaseAuthRepository {
         session: null,
         error: {
           message: "Sign in failed",
+        },
+      };
+    }
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  }
+
+  async phoneSignIn(phone: string, password: string): Promise<IAuthResponseData> {
+    const { data, error } = await this.supabase.auth.signInWithPassword({
+      phone,
+      password,
+    });
+
+    if (error) {
+      return {
+        user: null,
+        session: null,
+        error: {
+          message: error.message,
+          status: error.status,
+        },
+      };
+    }
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  }
+
+  async phoneSignUp(phone: string, password: string, additionalData?: IPhoneSignUpAdditionalData): Promise<IAuthResponseData> {
+    const { data, error } = await this.supabase.auth.signUp({
+      phone,
+      password,
+      options: {
+        data: { ...additionalData?.data },
+        channel: additionalData?.channel,
+      },
+    });
+
+    if (error) {
+      return {
+        user: null,
+        session: null,
+        error: {
+          message: error.message,
+          status: error.status,
         },
       };
     }
