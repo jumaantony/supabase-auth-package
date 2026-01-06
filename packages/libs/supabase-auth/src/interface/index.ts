@@ -34,7 +34,19 @@ export interface IEmailSignUpAdditionalData{
   data?: Record<string, any>;
 }
 
-export interface IPhoneSignUpAdditionalData {
+export interface IChannelData {
   channel: 'sms' | 'whatsapp';
+}
+
+export interface IPhoneSignUpAdditionalData {
+  channel: IChannelData['channel'];
+  data?: Record<string, any>;
+}
+
+export interface IUpdateUserData {
+  email?: string;
+  phone?: string;
+  password?: string;
+  user_metadata?: Record<string, any>;
   data?: Record<string, any>;
 }

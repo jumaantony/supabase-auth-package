@@ -1,10 +1,12 @@
 import { Injectable, Inject } from "@nestjs/common";
-import { SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient, User } from "@supabase/supabase-js";
 import {
   IEmailSignUpAdditionalData,
   IAuthResponseData,
   IPhoneSignUpAdditionalData,
   SUPABASE_CLIENT,
+  IChannelData,
+  IUpdateUserData,
 } from "../interface";
 
 @Injectable()
@@ -129,6 +131,124 @@ export class SupabaseAuthRepository {
       user: data.user,
       session: data.session,
     };
+  }
+
+  async verifyEmailOtp(email: string, token: string): Promise<IAuthResponseData> {
+    const { data, error } = await this.supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    });
+
+    if (error) {
+      return {
+        user: null,
+        session: null,
+        error: {
+          message: error.message,
+          status: error.status,
+        },
+      };
+    }
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  }
+
+  async verifyPhoneOtp(phone: string, token: string): Promise<IAuthResponseData> {
+    const { data, error } = await this.supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms',
+    });
+
+    if (error) {
+      return {
+        user: null,
+        session: null,
+        error: {
+          message: error.message,
+          status: error.status,
+        },
+      };
+    }
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  }
+
+  async requestEmailOtp(email: string): Promise<IAuthResponseData> {
+    const { data, error } = await this.supabase.auth.signInWithOtp({
+      email,
+    });
+
+    if (error) {
+      return {
+        user: null,
+        session: null,
+        error: {
+          message: error.message,
+          status: error.status,
+        },
+      };
+    }
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  }
+
+  async requestPhoneOtp(phone: string, channel: IChannelData): Promise<IAuthResponseData> {
+    const { data, error } = await this.supabase.auth.signInWithOtp({
+      phone,
+      options: {
+        channel: channel.channel,
+      },
+    });
+
+    if (error) {
+      return {
+        user: null,
+        session: null,
+        error: {
+          message: error.message,
+          status: error.status,
+        },
+      };
+    }
+
+    return {
+      user: data.user,
+      session: data.session,
+    };
+  }
+
+  async updateUser(
+    userId: string,
+    updateUserData: IUpdateUserData
+  ): Promise<User | { error: { message: string; status?: number } }> {
+    const { data, error } = await this.supabase.auth.admin.updateUserById(
+      userId,
+      {
+        ...updateUserData,
+      }
+    );
+
+    if (error) {
+      return {
+        error: {
+          message: error.message,
+          status: error.status,
+        },
+      };
+    }
+
+    return data.user;
   }
 
   async deleteUser(userId: string): Promise<void | object> {
