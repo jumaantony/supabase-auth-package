@@ -50,3 +50,7 @@ export interface IUpdateUserData {
   user_metadata?: Record<string, any>;
   data?: Record<string, any>;
 }
+
+export interface UserData{
+  user: User;
+}
