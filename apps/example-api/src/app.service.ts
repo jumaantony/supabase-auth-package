@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { IAuthResponseData, SupabaseAuthService } from '@app/supabase-auth';
+import {
+  IAuthResponseData,
+  IChannelData,
+  IUpdateUserData,
+  SupabaseAuthService,
+  UserData,
+} from '@app/supabase-auth';
 
 @Injectable()
 export class AppService {
@@ -28,6 +34,84 @@ export class AppService {
           name: 'John Doe',
         },
       },
+    );
+    return response;
+  }
+
+  public async requestEmailOtp(email: string): Promise<IAuthResponseData> {
+    const response = await this.supabaseAuthService.requestEmailOtp(email);
+    return response;
+  }
+
+  public async verifyEmailOtp(
+    email: string,
+    token: string,
+  ): Promise<IAuthResponseData> {
+    const response = await this.supabaseAuthService.verifyEmailOtp(
+      email,
+      token,
+    );
+    return response;
+  }
+
+  public async phoneSignIn(
+    phone: string,
+    password: string,
+  ): Promise<IAuthResponseData> {
+    const response = await this.supabaseAuthService.phoneSignIn(
+      phone,
+      password,
+    );
+    return response;
+  }
+
+  public async phoneSignUp(
+    phone: string,
+    password: string,
+  ): Promise<IAuthResponseData> {
+    const response = await this.supabaseAuthService.phoneSignUp(
+      phone,
+      password,
+    );
+    return response;
+  }
+
+  public async requestPhoneOtp(
+    phone: string,
+    channel: IChannelData,
+  ): Promise<IAuthResponseData> {
+    const response = await this.supabaseAuthService.requestPhoneOtp(
+      phone,
+      channel,
+    );
+    return response;
+  }
+
+  public async verifyPhoneOtp(
+    phone: string,
+    token: string,
+  ): Promise<IAuthResponseData> {
+    const response = await this.supabaseAuthService.verifyPhoneOtp(
+      phone,
+      token,
+    );
+    return response;
+  }
+
+  public async deleteUser(userId: string): Promise<void | object> {
+    const response = await this.supabaseAuthService.deleteUser(userId);
+    return response;
+  }
+
+  public async updateUser(
+    userId: string,
+    updateUserData: IUpdateUserData,
+  ): Promise<
+    UserData['user'] | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthService.updateUser(
+      userId,
+      updateUserData,
     );
     return response;
   }
