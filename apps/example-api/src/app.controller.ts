@@ -19,7 +19,7 @@ export class AppController {
   @ApiResponse({ status: 200, description: 'Email sign in successful' })
   public async emailSignIn(
     @Body() body: EmailAuthCredentialsDto,
-  ): Promise<IAuthResponseData> {
+  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
     const response = await this.appService.emailSignIn(
       body.email,
       body.password,
@@ -33,7 +33,7 @@ export class AppController {
   @ApiResponse({ status: 200, description: 'Email sign up successful' })
   public async emailSignUp(
     @Body() body: EmailAuthCredentialsDto,
-  ): Promise<IAuthResponseData> {
+  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
     const response = await this.appService.emailSignUp(
       body.email,
       body.password,
@@ -47,7 +47,7 @@ export class AppController {
   @ApiResponse({ status: 200, description: 'Email OTP requested successfully' })
   public async requestEmailOtp(
     @Body() body: EmailDataDto,
-  ): Promise<IAuthResponseData> {
+  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
     const response = await this.appService.requestEmailOtp(body.email);
     return response;
   }
@@ -58,7 +58,7 @@ export class AppController {
   @ApiResponse({ status: 200, description: 'Email OTP verified successfully' })
   public async verifyEmailOtp(
     @Body() body: EmailOtpDataDto,
-  ): Promise<IAuthResponseData> {
+  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
     const response = await this.appService.verifyEmailOtp(
       body.email,
       body.token,

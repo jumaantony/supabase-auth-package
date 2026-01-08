@@ -20,7 +20,7 @@ export class SupabaseAuthRepository {
     email: string,
     password: string,
     additionalData?: IEmailSignUpAdditionalData
-  ): Promise<IAuthResponseData> {
+  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
     const { data, error } = await this.supabase.auth.signUp({
       email,
       password,
@@ -32,8 +32,6 @@ export class SupabaseAuthRepository {
 
     if (error) {
       return {
-        user: null,
-        session: null,
         error: {
           message: error.message,
           status: error.status,
@@ -50,7 +48,7 @@ export class SupabaseAuthRepository {
   async emailSignIn(
     email: string,
     password: string
-  ): Promise<IAuthResponseData> {
+  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,
@@ -58,8 +56,6 @@ export class SupabaseAuthRepository {
 
     if (error) {
       return {
-        user: null,
-        session: null,
         error: {
           message: error.message,
           status: error.status,
@@ -83,7 +79,7 @@ export class SupabaseAuthRepository {
     };
   }
 
-  async phoneSignIn(phone: string, password: string): Promise<IAuthResponseData> {
+  async phoneSignIn(phone: string, password: string): Promise<IAuthResponseData | { error: { message: string; status?: number }}> {
     const { data, error } = await this.supabase.auth.signInWithPassword({
       phone,
       password,
@@ -91,8 +87,6 @@ export class SupabaseAuthRepository {
 
     if (error) {
       return {
-        user: null,
-        session: null,
         error: {
           message: error.message,
           status: error.status,
@@ -106,7 +100,7 @@ export class SupabaseAuthRepository {
     };
   }
 
-  async phoneSignUp(phone: string, password: string, additionalData?: IPhoneSignUpAdditionalData): Promise<IAuthResponseData> {
+  async phoneSignUp(phone: string, password: string, additionalData?: IPhoneSignUpAdditionalData): Promise<IAuthResponseData | { error: { message: string; status?: number }}> {
     const { data, error } = await this.supabase.auth.signUp({
       phone,
       password,
@@ -118,8 +112,6 @@ export class SupabaseAuthRepository {
 
     if (error) {
       return {
-        user: null,
-        session: null,
         error: {
           message: error.message,
           status: error.status,
@@ -133,7 +125,7 @@ export class SupabaseAuthRepository {
     };
   }
 
-  async verifyEmailOtp(email: string, token: string): Promise<IAuthResponseData> {
+  async verifyEmailOtp(email: string, token: string): Promise<IAuthResponseData | { error: { message: string; status?: number }}> {
     const { data, error } = await this.supabase.auth.verifyOtp({
       email,
       token,
@@ -142,8 +134,6 @@ export class SupabaseAuthRepository {
 
     if (error) {
       return {
-        user: null,
-        session: null,
         error: {
           message: error.message,
           status: error.status,
@@ -157,7 +147,7 @@ export class SupabaseAuthRepository {
     };
   }
 
-  async verifyPhoneOtp(phone: string, token: string): Promise<IAuthResponseData> {
+  async verifyPhoneOtp(phone: string, token: string): Promise<IAuthResponseData | { error: { message: string; status?: number }}> {
     const { data, error } = await this.supabase.auth.verifyOtp({
       phone,
       token,
@@ -166,8 +156,6 @@ export class SupabaseAuthRepository {
 
     if (error) {
       return {
-        user: null,
-        session: null,
         error: {
           message: error.message,
           status: error.status,
@@ -181,15 +169,13 @@ export class SupabaseAuthRepository {
     };
   }
 
-  async requestEmailOtp(email: string): Promise<IAuthResponseData> {
+  async requestEmailOtp(email: string): Promise<IAuthResponseData | { error: { message: string; status?: number }}> {
     const { data, error } = await this.supabase.auth.signInWithOtp({
       email,
     });
 
     if (error) {
       return {
-        user: null,
-        session: null,
         error: {
           message: error.message,
           status: error.status,
@@ -203,7 +189,7 @@ export class SupabaseAuthRepository {
     };
   }
 
-  async requestPhoneOtp(phone: string, channel: IChannelData): Promise<IAuthResponseData> {
+  async requestPhoneOtp(phone: string, channel: IChannelData): Promise<IAuthResponseData | { error: { message: string; status?: number }}> {
     const { data, error } = await this.supabase.auth.signInWithOtp({
       phone,
       options: {
@@ -212,9 +198,7 @@ export class SupabaseAuthRepository {
     });
 
     if (error) {
-      return {
-        user: null,
-        session: null,
+      return {  
         error: {
           message: error.message,
           status: error.status,
@@ -251,7 +235,7 @@ export class SupabaseAuthRepository {
     return data.user;
   }
 
-  async deleteUser(userId: string): Promise<void | object> {
+  async deleteUser(userId: string): Promise<void | { error: { message: string; status?: number } }> {
     const { error } = await this.supabase.auth.admin.deleteUser(userId);
     if (error) {
       return {
@@ -261,5 +245,7 @@ export class SupabaseAuthRepository {
         },
       };
     }
+
+    return;
   }
 }

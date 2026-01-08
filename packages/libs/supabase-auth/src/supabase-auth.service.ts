@@ -1,11 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { SupabaseAuthRepository } from './repositories/supabase-auth.repository';
-import { IEmailSignUpAdditionalData, IAuthResponseData, IPhoneSignUpAdditionalData, IUpdateUserData, IChannelData } from './interface';
-import { User } from '@supabase/supabase-js';
+import { Injectable } from "@nestjs/common";
+import { SupabaseAuthRepository } from "./repositories/supabase-auth.repository";
+import {
+  IEmailSignUpAdditionalData,
+  IAuthResponseData,
+  IPhoneSignUpAdditionalData,
+  IUpdateUserData,
+  IChannelData,
+} from "./interface";
+import { User } from "@supabase/supabase-js";
 
 @Injectable()
 export class SupabaseAuthService {
-  constructor(private readonly supabaseAuthRepository: SupabaseAuthRepository) {}
+  constructor(
+    private readonly supabaseAuthRepository: SupabaseAuthRepository
+  ) {}
 
   /**
    * Sign in a user with email and password
@@ -13,8 +21,16 @@ export class SupabaseAuthService {
    * @param password - The password of the user
    * @returns The response data
    */
-  public async emailSignIn(email: string, password: string): Promise<IAuthResponseData> {
-    const response = await this.supabaseAuthRepository.emailSignIn(email, password);
+  public async emailSignIn(
+    email: string,
+    password: string
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthRepository.emailSignIn(
+      email,
+      password
+    );
     return response;
   }
 
@@ -22,11 +38,21 @@ export class SupabaseAuthService {
    * Sign up a user with email and password
    * @param email - The email of the user
    * @param password - The password of the user
-   * @param additionalData - Additional data for the user 
+   * @param additionalData - Additional data for the user
    * @returns The response data
    */
-  public async emailSignUp(email: string, password: string, additionalData?: IEmailSignUpAdditionalData): Promise<IAuthResponseData> {
-    const response = await this.supabaseAuthRepository.emailSignUp(email, password, additionalData);
+  public async emailSignUp(
+    email: string,
+    password: string,
+    additionalData?: IEmailSignUpAdditionalData
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthRepository.emailSignUp(
+      email,
+      password,
+      additionalData
+    );
     return response;
   }
 
@@ -37,8 +63,18 @@ export class SupabaseAuthService {
    * @param additionalData - Additional data for the user
    * @returns The response data
    */
-  public async phoneSignUp(phone: string, password: string, additionalData?: IPhoneSignUpAdditionalData): Promise<IAuthResponseData> {
-    const response = await this.supabaseAuthRepository.phoneSignUp(phone, password, additionalData);
+  public async phoneSignUp(
+    phone: string,
+    password: string,
+    additionalData?: IPhoneSignUpAdditionalData
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthRepository.phoneSignUp(
+      phone,
+      password,
+      additionalData
+    );
     return response;
   }
 
@@ -48,8 +84,16 @@ export class SupabaseAuthService {
    * @param password - The password of the user
    * @returns The response data
    */
-  public async phoneSignIn(phone: string, password: string): Promise<IAuthResponseData> {
-    const response = await this.supabaseAuthRepository.phoneSignIn(phone, password);
+  public async phoneSignIn(
+    phone: string,
+    password: string
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthRepository.phoneSignIn(
+      phone,
+      password
+    );
     return response;
   }
 
@@ -58,7 +102,9 @@ export class SupabaseAuthService {
    * @param userId - The ID of the user
    * @returns The response data
    */
-  public async deleteUser(userId: string): Promise<void | object> {
+  public async deleteUser(
+    userId: string
+  ): Promise<void | { error: { message: string; status?: number } }> {
     const response = await this.supabaseAuthRepository.deleteUser(userId);
     return response;
   }
@@ -69,20 +115,33 @@ export class SupabaseAuthService {
    * @param updateUserData - The data to update the user
    * @returns The response data
    */
-  public async updateUser(userId: string, updateUserData: IUpdateUserData): Promise<User | { error: { message: string; status?: number } }> {
-    const response = await this.supabaseAuthRepository.updateUser(userId, updateUserData);
+  public async updateUser(
+    userId: string,
+    updateUserData: IUpdateUserData
+  ): Promise<User | { error: { message: string; status?: number } }> {
+    const response = await this.supabaseAuthRepository.updateUser(
+      userId,
+      updateUserData
+    );
     return response;
   }
 
-  
   /**
    * Verify an email OTP
    * @param email - The email of the user
    * @param token - The OTP token
    * @returns The response data
    */
-  public async verifyEmailOtp(email: string, token: string): Promise<IAuthResponseData> {
-    const response = await this.supabaseAuthRepository.verifyEmailOtp(email, token);
+  public async verifyEmailOtp(
+    email: string,
+    token: string
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthRepository.verifyEmailOtp(
+      email,
+      token
+    );
     return response;
   }
 
@@ -92,8 +151,16 @@ export class SupabaseAuthService {
    * @param token - The OTP token
    * @returns The response data
    */
-  public async verifyPhoneOtp(phone: string, token: string): Promise<IAuthResponseData> {
-    const response = await this.supabaseAuthRepository.verifyPhoneOtp(phone, token);
+  public async verifyPhoneOtp(
+    phone: string,
+    token: string
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthRepository.verifyPhoneOtp(
+      phone,
+      token
+    );
     return response;
   }
 
@@ -102,7 +169,11 @@ export class SupabaseAuthService {
    * @param email - The email of the user
    * @returns The response data
    */
-  public async requestEmailOtp(email: string): Promise<IAuthResponseData> {
+  public async requestEmailOtp(
+    email: string
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
     const response = await this.supabaseAuthRepository.requestEmailOtp(email);
     return response;
   }
@@ -113,8 +184,16 @@ export class SupabaseAuthService {
    * @param channel - The channel of the user
    * @returns The response data
    */
-  public async requestPhoneOtp(phone: string, channel: IChannelData): Promise<IAuthResponseData> {
-    const response = await this.supabaseAuthRepository.requestPhoneOtp(phone, channel);
+  public async requestPhoneOtp(
+    phone: string,
+    channel: IChannelData
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthRepository.requestPhoneOtp(
+      phone,
+      channel
+    );
     return response;
   }
 }
