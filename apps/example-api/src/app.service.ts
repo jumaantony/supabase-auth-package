@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
   IAuthResponseData,
-  IChannelData,
   IUpdateUserData,
   SupabaseAuthService,
   UserData,
@@ -14,7 +13,9 @@ export class AppService {
   public async emailSignIn(
     email: string,
     password: string,
-  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
     const response = await this.supabaseAuthService.emailSignIn(
       email,
       password,
@@ -25,7 +26,9 @@ export class AppService {
   public async emailSignUp(
     email: string,
     password: string,
-  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
     const response = await this.supabaseAuthService.emailSignUp(
       email,
       password,
@@ -38,7 +41,11 @@ export class AppService {
     return response;
   }
 
-  public async requestEmailOtp(email: string): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
+  public async requestEmailOtp(
+    email: string,
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
     const response = await this.supabaseAuthService.requestEmailOtp(email);
     return response;
   }
@@ -46,7 +53,9 @@ export class AppService {
   public async verifyEmailOtp(
     email: string,
     token: string,
-  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
     const response = await this.supabaseAuthService.verifyEmailOtp(
       email,
       token,
@@ -57,7 +66,9 @@ export class AppService {
   public async phoneSignIn(
     phone: string,
     password: string,
-  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
     const response = await this.supabaseAuthService.phoneSignIn(
       phone,
       password,
@@ -68,7 +79,9 @@ export class AppService {
   public async phoneSignUp(
     phone: string,
     password: string,
-  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
     const response = await this.supabaseAuthService.phoneSignUp(
       phone,
       password,
@@ -78,19 +91,21 @@ export class AppService {
 
   public async requestPhoneOtp(
     phone: string,
-    channel: IChannelData,
-  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
-    const response = await this.supabaseAuthService.requestPhoneOtp(
-      phone,
-      channel,
-    );
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
+    const response = await this.supabaseAuthService.requestPhoneOtp(phone, {
+      channel: 'whatsapp',
+    });
     return response;
   }
 
   public async verifyPhoneOtp(
     phone: string,
     token: string,
-  ): Promise<IAuthResponseData | { error: { message: string; status?: number } }> {
+  ): Promise<
+    IAuthResponseData | { error: { message: string; status?: number } }
+  > {
     const response = await this.supabaseAuthService.verifyPhoneOtp(
       phone,
       token,
@@ -98,7 +113,9 @@ export class AppService {
     return response;
   }
 
-  public async deleteUser(userId: string): Promise<void | { error: { message: string; status?: number } }> {
+  public async deleteUser(
+    userId: string,
+  ): Promise<void | { error: { message: string; status?: number } }> {
     const response = await this.supabaseAuthService.deleteUser(userId);
     return response;
   }

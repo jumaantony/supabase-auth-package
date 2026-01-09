@@ -8,7 +8,7 @@ export class PhoneDataDto {
   phone: string;
 }
 
-export class PhoneAuthCredentials extends PhoneDataDto {
+export class PhoneAuthCredentialsDto extends PhoneDataDto {
   @ApiProperty({
     description: 'The password of the User',
     example: 'password',
