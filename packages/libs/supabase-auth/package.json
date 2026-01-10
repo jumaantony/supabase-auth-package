@@ -1,55 +1,55 @@
 {
-    "name": "@jumaantony/supabase-auth",
-    "version": "0.0.0",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "exports": {
-        ".": {
-            "require": "./dist/index.js",
-            "import": "./dist/index.js",
-            "types": "./dist/index.d.ts"
-        }
-    },
-    "scripts": {
-        "build": "tsc -p tsconfig.lib.json",
-        "check-types": "tsc -p tsconfig.lib.json --noEmit",
-        "test": "jest",
-        "test:watch": "jest --watch",
-        "test:cov": "jest --coverage"
-    },
-    "dependencies": {
-        "@nestjs/common": "^11.0.1",
-        "@supabase/supabase-js": "^2.89.0"
-    },
-    "devDependencies": {
-        "@nestjs/testing": "^11.0.1",
-        "@types/jest": "^29.5.14",
-        "@types/node": "^22.15.3",
-        "jest": "^29.7.0",
-        "ts-jest": "^29.2.5",
-        "typescript": "5.5.4"
-    },
-    "files": [
-        "dist"
+  "name": "@jumaantony/supabase-auth",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.lib.json",
+    "check-types": "tsc -p tsconfig.lib.json --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@supabase/supabase-js": "^2.89.0"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.0.1",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.15.3",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "5.5.4"
+  },
+  "files": [
+    "dist"
+  ],
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
     ],
-    "jest": {
-        "moduleFileExtensions": [
-            "js",
-            "json",
-            "ts"
-        ],
-        "rootDir": "src",
-        "testRegex": ".*\\.spec\\.ts$",
-        "transform": {
-            "^.+\\.(t|j)s$": "ts-jest"
-        },
-        "collectCoverageFrom": [
-            "**/*.(t|j)s"
-        ],
-        "coverageDirectory": "../coverage",
-        "testEnvironment": "node"
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
     },
-    "repository": {
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  },
+  "repository": {
     "type": "git",
     "url": "https://github.com/jumaantony/supabase-auth-package.git",
     "directory": "packages/libs/supabase-auth"
