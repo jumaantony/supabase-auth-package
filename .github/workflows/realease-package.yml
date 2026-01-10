@@ -98,6 +98,7 @@ jobs:
           "
           
           # Commit and push version bump
+          cd ${{ github.workspace }}
           git add packages/libs/supabase-auth/package.json
           git commit -m "chore: bump version to $NEW_VERSION [skip ci]" || exit 0
           git push || exit 0
