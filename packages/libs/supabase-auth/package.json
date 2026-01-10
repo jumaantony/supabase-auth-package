@@ -1,5 +1,5 @@
 {
-    "name": "@app/supabase-auth",
+    "name": "@jumaantony/supabase-auth",
     "version": "0.0.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -48,5 +48,13 @@
         ],
         "coverageDirectory": "../coverage",
         "testEnvironment": "node"
-    }
+    },
+    "repository": {
+    "type": "git",
+    "url": "https://github.com/jumaantony/supabase-auth-package.git",
+    "directory": "packages/libs/supabase-auth"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  }
 }

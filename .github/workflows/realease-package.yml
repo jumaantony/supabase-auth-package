@@ -1,0 +1,112 @@
+name: Release Package
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/libs/supabase-auth/**'
+      - '.github/workflows/realease-package.yml'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build package
+        run: pnpm build --filter=@jumaantony/supabase-auth
+      
+      - name: Run tests
+        run: pnpm test --filter=@jumaantony/supabase-auth
+
+  publish-gpr:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.PACKAGE_TOKEN }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://npm.pkg.github.com/
+          scope: '@jumaantony'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+      
+      - name: Bump version
+        working-directory: packages/libs/supabase-auth
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+          
+          # Skip if version is 0.0.0 (initial version)
+          if [ "$CURRENT_VERSION" = "0.0.0" ]; then
+            echo "Version is 0.0.0, setting to 0.0.1"
+            NEW_VERSION="0.0.1"
+          else
+            # Bump patch version using Node.js
+            NEW_VERSION=$(node -e "
+              const fs = require('fs');
+              const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+              const [major, minor, patch] = pkg.version.split('.').map(Number);
+              console.log(\`\${major}.\${minor}.\${patch + 1}\`);
+            ")
+          fi
+          
+          echo "New version: $NEW_VERSION"
+          
+          # Update package.json version
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+            pkg.version = '$NEW_VERSION';
+            fs.writeFileSync('./package.json', JSON.stringify(pkg, null, 2) + '\n');
+          "
+          
+          # Commit and push version bump
+          git add packages/libs/supabase-auth/package.json
+          git commit -m "chore: bump version to $NEW_VERSION [skip ci]" || exit 0
+          git push || exit 0
+      
+      - name: Build package
+        run: pnpm build --filter=@jumaantony/supabase-auth
+      
+      - name: Publish to GitHub Packages
+        working-directory: packages/libs/supabase-auth
+        run: pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGE_TOKEN }}
