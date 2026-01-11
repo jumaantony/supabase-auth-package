@@ -4,7 +4,7 @@ import {
   IUpdateUserData,
   SupabaseAuthService,
   UserData,
-} from '@app/supabase-auth';
+} from '@jumaantony/supabase-auth';
 
 @Injectable()
 export class AppService {

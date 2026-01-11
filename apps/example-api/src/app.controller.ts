@@ -6,7 +6,7 @@ import {
   EmailOtpDataDto,
 } from './dto/email-auth-credentials.dto';
 import { ApiBody, ApiResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
-import { IAuthResponseData, UserData } from '@app/supabase-auth';
+import { IAuthResponseData, UserData } from '@jumaantony/supabase-auth';
 import { UpdateUserDataDto } from './dto/update-user-data.dto';
 import {
   PhoneAuthCredentialsDto,
