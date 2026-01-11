@@ -1,24 +1,57 @@
-# @app/supabase-auth
+# @jumaantony/supabase-auth
 
-A NestJS module for Supabase authentication that provides a clean, type-safe interface for user authentication operations.
+A comprehensive NestJS module for Supabase authentication that provides a clean, type-safe interface for user authentication operations.
 
 ## Features
 
-- 🔐 Email/password authentication (sign up, sign in)
-- 🎯 Type-safe API with TypeScript
-- 🔧 Flexible configuration (environment variables or ConfigService)
-- 🛡️ Error handling with structured error responses
-- 📦 Dependency injection ready
-- 🚀 Easy to integrate with NestJS applications
+- 🔐 **Email/password authentication** (sign up, sign in)
+- 📱 **Phone authentication** (sign up, sign in)
+- 🔑 **OTP (One-Time Password) support** (email and SMS/WhatsApp)
+- 👤 **User management** (update, delete users)
+- 🎯 **Type-safe API** with TypeScript
+- 🔧 **Flexible configuration** (environment variables or ConfigService)
+- 🛡️ **Error handling** with structured error responses
+- 📦 **Dependency injection ready**
+- 🚀 **Easy to integrate** with NestJS applications
+- ✅ **Fully tested** with comprehensive test coverage
 
 ## Installation
 
+### From GitHub Packages
+
+The package is published to GitHub Packages. To install it:
+
+#### 1. Configure npm to use GitHub Packages
+
+Create or update your `.npmrc` file:
+
+```
+@jumaantony:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+#### 2. Authenticate with GitHub
+
+You'll need a GitHub Personal Access Token with `read:packages` permission:
+
 ```bash
-npm install @app/supabase-auth
+export GITHUB_TOKEN=your_github_token_here
+```
+
+Or add it to your `.npmrc` directly (not recommended for production):
+
+```
+//npm.pkg.github.com/:_authToken=your_github_token_here
+```
+
+#### 3. Install the package
+
+```bash
+npm install @jumaantony/supabase-auth
 # or
-pnpm add @app/supabase-auth
+pnpm add @jumaantony/supabase-auth
 # or
-yarn add @app/supabase-auth
+yarn add @jumaantony/supabase-auth
 ```
 
 ## Prerequisites
@@ -45,7 +78,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 
 ```typescript
 import { Module } from '@nestjs/common';
-import { SupabaseAuthModule } from '@app/supabase-auth';
+import { SupabaseAuthModule } from '@jumaantony/supabase-auth';
 
 @Module({
   imports: [SupabaseAuthModule.forRoot()],
@@ -58,7 +91,7 @@ export class AppModule {}
 ```typescript
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SupabaseAuthModule } from '@app/supabase-auth';
+import { SupabaseAuthModule } from '@jumaantony/supabase-auth';
 
 @Module({
   imports: [
@@ -80,7 +113,7 @@ export class AppModule {}
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { SupabaseAuthService } from '@app/supabase-auth';
+import { SupabaseAuthService } from '@jumaantony/supabase-auth';
 
 @Injectable()
 export class AuthService {
@@ -88,12 +121,7 @@ export class AuthService {
 
   async signIn(email: string, password: string) {
     const response = await this.supabaseAuthService.emailSignIn(email, password);
-    
-    if (response.error) {
-      // Handle error
-      throw new Error(response.error.message);
-    }
-    
+        
     // Success - use response.user and response.session
     return {
       user: response.user,
@@ -109,42 +137,113 @@ export class AuthService {
 
 The main service for authentication operations.
 
-#### `emailSignIn(email: string, password: string): Promise<IAuthResponseData>`
+#### Email Authentication
+
+##### `emailSignIn(email: string, password: string): Promise<IAuthResponseData | { error: { message: string; status?: number } }>`
 
 Sign in a user with email and password.
 
 ```typescript
 const response = await supabaseAuthService.emailSignIn('user@example.com', 'password123');
-
-if (response.error) {
-  console.error('Sign in failed:', response.error.message);
-} else {
-  console.log('User:', response.user);
-  console.log('Session:', response.session);
-}
 ```
 
-#### `emailSignUp(email: string, password: string, additionalData?: IAuthAdditionalData): Promise<IAuthResponseData>`
+#### Phone Authentication
 
-Sign up a new user with email and password.
+##### `phoneSignIn(phone: string, password: string): Promise<IAuthResponseData | { error: { message: string; status?: number } }>`
+
+Sign in a user with phone number and password.
 
 ```typescript
-const response = await supabaseAuthService.emailSignUp(
-  'user@example.com',
+const response = await supabaseAuthService.phoneSignIn('+1234567890', 'password123');
+```
+
+##### `phoneSignUp(phone: string, password: string, additionalData?: IPhoneSignUpAdditionalData): Promise<IAuthResponseData | { error: { message: string; status?: number } }>`
+
+Sign up a new user with phone number and password.
+
+```typescript
+const response = await supabaseAuthService.phoneSignUp(
+  '+1234567890',
   'password123',
   {
-    emailRedirectTo: 'https://yourapp.com/confirm',
+    channel: 'sms', // or 'whatsapp'
     data: {
       full_name: 'John Doe',
-      role: 'user',
     },
   }
 );
+```
 
-if (response.error) {
-  console.error('Sign up failed:', response.error.message);
+#### OTP (One-Time Password) Authentication
+
+##### `requestEmailOtp(email: string): Promise<IAuthResponseData | { error: { message: string; status?: number } }>`
+
+Request an OTP to be sent to the user's email.
+
+```typescript
+const response = await supabaseAuthService.requestEmailOtp('user@example.com');
+```
+
+##### `requestPhoneOtp(phone: string, channel: IChannelData): Promise<IAuthResponseData | { error: { message: string; status?: number } }>`
+
+Request an OTP to be sent via SMS or WhatsApp.
+
+```typescript
+const response = await supabaseAuthService.requestPhoneOtp('+1234567890', {
+  channel: 'sms', // or 'whatsapp'
+});
+```
+
+##### `verifyEmailOtp(email: string, token: string): Promise<IAuthResponseData | { error: { message: string; status?: number } }>`
+
+Verify an email OTP token.
+
+```typescript
+const response = await supabaseAuthService.verifyEmailOtp('user@example.com', '123456');
+```
+
+##### `verifyPhoneOtp(phone: string, token: string): Promise<IAuthResponseData | { error: { message: string; status?: number } }>`
+
+Verify a phone OTP token.
+
+```typescript
+const response = await supabaseAuthService.verifyPhoneOtp('+1234567890', '123456');
+```
+
+#### User Management
+
+##### `updateUser(userId: string, updateUserData: IUpdateUserData): Promise<User | { error: { message: string; status?: number } }>`
+
+Update a user's information.
+
+```typescript
+const result = await supabaseAuthService.updateUser('user-id', {
+  email: 'newemail@example.com',
+  phone: '+1234567890',
+  password: 'newpassword',
+  user_metadata: {
+    full_name: 'Updated Name',
+  },
+});
+
+if ('error' in result) {
+  console.error('Update failed:', result.error.message);
 } else {
-  console.log('User created:', response.user);
+  console.log('User updated:', result);
+}
+```
+
+##### `deleteUser(userId: string): Promise<void | { error: { message: string; status?: number } }>`
+
+Delete a user.
+
+```typescript
+const result = await supabaseAuthService.deleteUser('user-id');
+
+if (result && 'error' in result) {
+  console.error('Delete failed:', result.error.message);
+} else {
+  console.log('User deleted successfully');
 }
 ```
 
@@ -154,7 +253,7 @@ Lower-level repository for direct Supabase client access. Can be injected if you
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { SupabaseAuthRepository } from '@app/supabase-auth';
+import { SupabaseAuthRepository } from '@jumaantony/supabase-auth';
 
 @Injectable()
 export class CustomAuthService {
@@ -171,7 +270,7 @@ The Supabase client instance can be injected directly if you need access to the 
 ```typescript
 import { Injectable, Inject } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { SUPABASE_CLIENT } from '@app/supabase-auth';
+import { SUPABASE_CLIENT } from '@jumaantony/supabase-auth';
 
 @Injectable()
 export class CustomService {
@@ -221,14 +320,49 @@ interface IAuthResponseData {
 }
 ```
 
-### IAuthAdditionalData
+### IEmailSignUpAdditionalData
 
-Additional data for sign up operations.
+Additional data for email sign up operations.
 
 ```typescript
-interface IAuthAdditionalData {
+interface IEmailSignUpAdditionalData {
   emailRedirectTo?: string;  // URL to redirect after email confirmation
   data?: Record<string, any>; // Additional user metadata
+}
+```
+
+### IPhoneSignUpAdditionalData
+
+Additional data for phone sign up operations.
+
+```typescript
+interface IPhoneSignUpAdditionalData {
+  channel: 'sms' | 'whatsapp';  // Channel for OTP delivery
+  data?: Record<string, any>;   // Additional user metadata
+}
+```
+
+### IChannelData
+
+Channel configuration for phone OTP requests.
+
+```typescript
+interface IChannelData {
+  channel: 'sms' | 'whatsapp';
+}
+```
+
+### IUpdateUserData
+
+Data for updating user information.
+
+```typescript
+interface IUpdateUserData {
+  email?: string;
+  phone?: string;
+  password?: string;
+  user_metadata?: Record<string, any>;
+  data?: Record<string, any>;
 }
 ```
 
@@ -239,7 +373,7 @@ All authentication methods return a structured response that includes an optiona
 ```typescript
 const response = await supabaseAuthService.emailSignIn(email, password);
 
-if (response.error) {
+if ('error' in response && response.error) {
   // Handle error
   return {
     success: false,
@@ -259,9 +393,9 @@ return {
 ## Example: Complete Controller Implementation
 
 ```typescript
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { SupabaseAuthService } from '@app/supabase-auth';
-import { IAuthResponseData } from '@app/supabase-auth';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Param, Delete, Put } from '@nestjs/common';
+import { SupabaseAuthService } from '@jumaantony/supabase-auth';
+import { IAuthResponseData } from '@jumaantony/supabase-auth';
 
 @Controller('auth')
 export class AuthController {
@@ -297,6 +431,72 @@ export class AuthController {
       }
     );
   }
+
+  @Post('phone/sign-in')
+  @HttpCode(HttpStatus.OK)
+  async phoneSignIn(
+    @Body() body: { phone: string; password: string }
+  ): Promise<IAuthResponseData> {
+    return await this.supabaseAuthService.phoneSignIn(
+      body.phone,
+      body.password
+    );
+  }
+
+  @Post('otp/email/request')
+  @HttpCode(HttpStatus.OK)
+  async requestEmailOtp(
+    @Body() body: { email: string }
+  ): Promise<IAuthResponseData> {
+    return await this.supabaseAuthService.requestEmailOtp(body.email);
+  }
+
+  @Post('otp/email/verify')
+  @HttpCode(HttpStatus.OK)
+  async verifyEmailOtp(
+    @Body() body: { email: string; token: string }
+  ): Promise<IAuthResponseData> {
+    return await this.supabaseAuthService.verifyEmailOtp(
+      body.email,
+      body.token
+    );
+  }
+
+  @Post('otp/phone/request')
+  @HttpCode(HttpStatus.OK)
+  async requestPhoneOtp(
+    @Body() body: { phone: string; channel: 'sms' | 'whatsapp' }
+  ): Promise<IAuthResponseData> {
+    return await this.supabaseAuthService.requestPhoneOtp(body.phone, {
+      channel: body.channel,
+    });
+  }
+
+  @Post('otp/phone/verify')
+  @HttpCode(HttpStatus.OK)
+  async verifyPhoneOtp(
+    @Body() body: { phone: string; token: string }
+  ): Promise<IAuthResponseData> {
+    return await this.supabaseAuthService.verifyPhoneOtp(
+      body.phone,
+      body.token
+    );
+  }
+
+  @Put('users/:id')
+  @HttpCode(HttpStatus.OK)
+  async updateUser(
+    @Param('id') userId: string,
+    @Body() updateData: IUpdateUserData
+  ) {
+    return await this.supabaseAuthService.updateUser(userId, updateData);
+  }
+
+  @Delete('users/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteUser(@Param('id') userId: string) {
+    return await this.supabaseAuthService.deleteUser(userId);
+  }
 }
 ```
 
@@ -328,7 +528,28 @@ SupabaseAuthModule.forRootAsync({
 })
 ```
 
+## Testing
+
+The package includes comprehensive test coverage. To run tests:
+
+```bash
+pnpm test
+```
+
+To run tests with coverage:
+
+```bash
+pnpm test:cov
+```
+
+## Versioning
+
+This package follows [Semantic Versioning](https://semver.org/). The package is automatically published to GitHub Packages whenever changes are pushed to the `main` branch in the `packages/libs/supabase-auth` directory.
+
 ## License
 
 This package is part of your monorepo and follows the same license as your project.
 
+## Support
+
+For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/jumaantony/supabase-auth-package).

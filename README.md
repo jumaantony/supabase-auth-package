@@ -8,13 +8,18 @@ This Turborepo monorepo includes the following:
 
 ### Apps
 
-- **`example-api`** - A NestJS API application demonstrating how to use the `@app/supabase-auth` package
+- **`example-api`** - A NestJS API application demonstrating how to use the `@jumaantony/supabase-auth` package
 - **`docs`** - A Next.js documentation site
 - **`web`** - A Next.js web application
 
 ### Packages
 
-- **`@app/supabase-auth`** - A NestJS module for Supabase authentication with email/password support
+- **`@jumaantony/supabase-auth`** - A comprehensive NestJS module for Supabase authentication with:
+  - Email/password authentication
+  - Phone authentication
+  - OTP (One-Time Password) support
+  - User management (update, delete)
+  - Type-safe API with TypeScript
   - See [packages/libs/supabase-auth/README.md](./packages/libs/supabase-auth/README.md) for detailed documentation
 - **`@repo/ui`** - Shared React component library
 - **`@repo/eslint-config`** - Shared ESLint configurations
@@ -80,7 +85,7 @@ Build a specific package:
 
 ```bash
 # Build the supabase-auth library
-pnpm build --filter=@app/supabase-auth
+pnpm build --filter=@jumaantony/supabase-auth
 
 # Build the example API
 pnpm build --filter=example-api
@@ -97,7 +102,7 @@ pnpm lint
 Lint a specific package:
 
 ```bash
-pnpm lint --filter=@app/supabase-auth
+pnpm lint --filter=@jumaantony/supabase-auth
 ```
 
 ### Type Checking
@@ -112,8 +117,39 @@ pnpm check-types
 
 ### Installation in Your Project
 
+The package is published to GitHub Packages. To install it:
+
+#### 1. Configure npm to use GitHub Packages
+
+Create or update your `.npmrc` file:
+
+```
+@jumaantony:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+#### 2. Authenticate with GitHub
+
+You'll need a GitHub Personal Access Token with `read:packages` permission:
+
 ```bash
-pnpm add @app/supabase-auth
+export GITHUB_TOKEN=your_github_token_here
+```
+
+Or add it to your `.npmrc` directly (not recommended for production):
+
+```
+//npm.pkg.github.com/:_authToken=your_github_token_here
+```
+
+#### 3. Install the package
+
+```bash
+pnpm add @jumaantony/supabase-auth
+# or
+npm install @jumaantony/supabase-auth
+# or
+yarn add @jumaantony/supabase-auth
 ```
 
 ### Quick Example
@@ -121,7 +157,7 @@ pnpm add @app/supabase-auth
 ```typescript
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SupabaseAuthModule } from '@app/supabase-auth';
+import { SupabaseAuthModule } from '@jumaantony/supabase-auth';
 
 @Module({
   imports: [
@@ -141,7 +177,7 @@ export class AppModule {}
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { SupabaseAuthService } from '@app/supabase-auth';
+import { SupabaseAuthService } from '@jumaantony/supabase-auth';
 
 @Injectable()
 export class AuthService {
@@ -150,7 +186,7 @@ export class AuthService {
   async signIn(email: string, password: string) {
     const response = await this.supabaseAuthService.emailSignIn(email, password);
     
-    if (response.error) {
+    if ('error' in response && response.error) {
       throw new Error(response.error.message);
     }
     
@@ -178,18 +214,54 @@ For complete documentation, see [packages/libs/supabase-auth/README.md](./packag
 │   ├── ui/                    # Shared UI components
 │   ├── eslint-config/         # ESLint configurations
 │   └── typescript-config/     # TypeScript configurations
+├── .github/
+│   └── workflows/
+│       └── realease-package.yml  # CI/CD workflow for automatic publishing
 ├── turbo.json                 # Turborepo configuration
 └── pnpm-workspace.yaml        # pnpm workspace configuration
 ```
 
 ## 🧪 Testing
 
-### Run tests for a specific app
+### Run tests for a specific package
 
 ```bash
+# Run supabase-auth package tests
+pnpm test --filter=@jumaantony/supabase-auth
+
 # Run example-api tests
 pnpm test --filter=example-api
 ```
+
+### Run tests with coverage
+
+```bash
+pnpm test:cov --filter=@jumaantony/supabase-auth
+```
+
+## 📦 Package Publishing
+
+The `@jumaantony/supabase-auth` package is automatically published to GitHub Packages whenever changes are pushed to the `main` branch in the `packages/libs/supabase-auth` directory.
+
+### Automatic Versioning
+
+- The workflow automatically bumps the patch version (e.g., `0.0.1` → `0.0.2`)
+- Version bumps are committed back to the repository
+- Publishing happens automatically after successful tests and builds
+
+### Manual Publishing
+
+If you need to publish manually:
+
+```bash
+cd packages/libs/supabase-auth
+pnpm publish
+```
+
+Make sure you have:
+- Updated the version in `package.json`
+- Built the package (`pnpm build`)
+- Authenticated with GitHub Packages (set `GITHUB_TOKEN` environment variable)
 
 ## 📝 Code Quality
 
@@ -199,6 +271,7 @@ This project uses:
 - **ESLint** for code linting
 - **Prettier** for code formatting
 - **Turborepo** for monorepo management
+- **Jest** for testing
 
 ### Format code
 
@@ -250,3 +323,4 @@ This project is private and proprietary.
 - [Turborepo Documentation](https://turborepo.org/docs)
 - [NestJS Documentation](https://docs.nestjs.com)
 - [Supabase Documentation](https://supabase.com/docs)
+- [GitHub Packages Documentation](https://docs.github.com/en/packages)
