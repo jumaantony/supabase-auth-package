@@ -6,9 +6,6 @@ on:
       - main
     paths:
       - 'packages/libs/supabase-auth/**'
-      - '.github/workflows/realease-package.yml'
-    paths-ignore:
-      - 'packages/libs/supabase-auth/**/*.md'
 
 jobs:
   build-and-test:
